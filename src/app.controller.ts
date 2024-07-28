@@ -11,11 +11,6 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // @Get('receive')
-  // receiveMessage(): string {
-  //   return this.appService.receiveMessage();
-  // }
-
   @MessagePattern('test')
   async checkMessage(@Payload() message: any) {
     console.log('Received message:', message);

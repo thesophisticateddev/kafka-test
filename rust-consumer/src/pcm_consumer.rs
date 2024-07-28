@@ -55,13 +55,15 @@ impl ConsumerBehavior for PCMConsumer {
         loop {
             for ms in self.consumer.poll().unwrap().iter() {
                 for m in ms.messages() {
-                    println!("Raw data: {:?}", m);
+                    // println!("Raw data: {:?}", m);
                     let json_data = PCMConsumer::get_event_data(&m);
                     println!("Json data {:?}", json_data);
                 }
                 let msg_consumed = self.consumer.consume_messageset(ms);
                 match msg_consumed {
-                    Ok(_) => info!("Consumed message"),
+                    Ok(_) => {
+                        info!("Consumed message");
+                    }
                     Err(e) => error!("Error consuming message: {:?}", e),
                 }
             }

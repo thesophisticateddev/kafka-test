@@ -19,12 +19,20 @@ fn main() {
     env::set_var("RUST_LOG", "trace");
     env::set_var("RUST_BACKTRACE", "1");
     pretty_env_logger::init();
-
-    let t1 = std::thread::spawn(move || start_consumer());
-
+    info!("Starting main thread!");
     loop {
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        info!("Main thread is running");
+        let handle = std::thread::spawn(move || start_consumer());
+
+        match handle.join() {
+            Ok(_) => {
+                warn!("Consumer thread is finished");
+            }
+            Err(e) => {
+                error!("Error in consumer thread: {:?}", e);
+            }
+        }
+        warn!("Restarting consumer thread in 20 seconds");
+        std::thread::sleep(std::time::Duration::from_secs(20));
     }
     // start_consumer();
 }

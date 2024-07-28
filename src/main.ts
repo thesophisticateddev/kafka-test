@@ -23,6 +23,6 @@ async function bootstrap() {
   });
   app.startAllMicroservices();
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+  await app.listen(config.get<number>('PORT') || 3000);
 }
 bootstrap();

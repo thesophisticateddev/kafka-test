@@ -27,6 +27,7 @@ export class KafkaService {
         topic,
         messages: [{ value: message }],
       });
+      KafkaService.logger.log('Message Sent to queue');
     });
   }
 
