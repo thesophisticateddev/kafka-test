@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, HydratedDocument } from 'mongoose';
+import { Document } from 'mongoose';
 
 export enum JobStatus {
   COMPLETED = 'completed',
@@ -24,20 +24,4 @@ export class Job {
 
 export const JobSchema = SchemaFactory.createForClass(Job);
 
-// export interface IJob {
-//   id: string;
-//   name: string;
-//   createdAt: Date;
-//   startTime: Date;
-//   status: JobStatus;
-// }
-
-// export interface IJob extends Document<Job> {
-//   id: string;
-// }
-
-// export interface IJob extends Job {
-//   id: string;
-// }
-
-export type IJob = HydratedDocument<Job>;
+export type IJob = Document<Job>;
