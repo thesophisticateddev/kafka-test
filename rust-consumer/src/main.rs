@@ -3,6 +3,7 @@ use std::env;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+mod model;
 mod pcm_consumer;
 use crate::pcm_consumer::{ConsumerBehavior, PCMConsumer};
 
