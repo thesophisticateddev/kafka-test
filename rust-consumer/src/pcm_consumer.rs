@@ -3,11 +3,14 @@ use kafka::{
     consumer::{Consumer, Message},
 };
 
+use crate::model::pcm_model::PCMModel;
+
 pub struct PCMConsumer {
     hosts: Vec<String>,
     consumer: Consumer,
     group_name: String,
     topic: String,
+    repo: PCMModel,
 }
 
 pub trait ConsumerBehavior {
@@ -31,6 +34,10 @@ impl PCMConsumer {
             consumer,
             group_name: GROUP_NAME.to_owned(),
             topic: TOPIC.to_owned(),
+            repo: PCMModel::new(
+                "mongodb://root:example@localhost:27017/".to_owned(),
+                "nest".to_owned(),
+            ),
         }
     }
 }
@@ -58,6 +65,7 @@ impl ConsumerBehavior for PCMConsumer {
                     // println!("Raw data: {:?}", m);
                     let json_data = PCMConsumer::get_event_data(&m);
                     println!("Json data {:?}", json_data);
+                    println!("Name of the personse {:?}", json_data["name"].as_str());
                 }
                 let msg_consumed = self.consumer.consume_messageset(ms);
                 match msg_consumed {

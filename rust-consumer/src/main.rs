@@ -3,6 +3,7 @@ use std::env;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+mod image_proc;
 mod model;
 mod pcm_consumer;
 use crate::pcm_consumer::{ConsumerBehavior, PCMConsumer};
@@ -17,7 +18,7 @@ fn start_consumer() {
     pcm_consumer.consume();
 }
 fn main() {
-    env::set_var("RUST_LOG", "trace");
+    env::set_var("RUST_LOG", "info");
     env::set_var("RUST_BACKTRACE", "1");
     pretty_env_logger::init();
     info!("Starting main thread!");

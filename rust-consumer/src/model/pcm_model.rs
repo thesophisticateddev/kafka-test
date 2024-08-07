@@ -1,7 +1,7 @@
 use mongodb::{bson::doc, options::FindOptions, sync::Collection};
 use serde::{Deserialize, Serialize};
 
-use super::repository_trait::Repository;
+use super::repository_trait::{DocumentMapper, Repository};
 
 const PCM_COLLECTION: &str = "pcm";
 
@@ -14,7 +14,6 @@ pub struct PCMDocument {
 
 pub struct PCMModel {
     collection: Collection<PCMDocument>,
-    db_name: String,
 }
 
 impl PCMModel {
@@ -24,10 +23,22 @@ impl PCMModel {
             .database(db_name.as_str())
             .collection::<PCMDocument>(PCM_COLLECTION)
             .clone_with_type();
-        PCMModel {
-            collection,
-            db_name: db_name.to_owned(),
+        PCMModel { collection }
+    }
+}
+
+impl DocumentMapper<PCMDocument> for PCMModel {
+    fn map_to_document(mut cursor: mongodb::sync::Cursor<PCMDocument>) -> Vec<PCMDocument> {
+        let mut results: Vec<PCMDocument> = Vec::new();
+        while let Some(doc) = cursor.next() {
+            match doc {
+                Ok(d) => results.push(d),
+                Err(err) => {
+                    eprintln!("Error occured while fetching results {:?}", err);
+                }
+            }
         }
+        return results;
     }
 }
 
@@ -45,15 +56,7 @@ impl Repository<PCMDocument> for PCMModel {
         let query_result = self.collection.find(None, opts);
         match query_result {
             Ok(mut cursor) => {
-                let mut results: Vec<PCMDocument> = Vec::new();
-                while let Some(doc) = cursor.next() {
-                    match doc {
-                        Ok(d) => results.push(d),
-                        Err(err) => {
-                            return Err(err);
-                        }
-                    }
-                }
+                let results = PCMModel::map_to_document(cursor);
                 Ok(results)
             }
             Err(err) => {

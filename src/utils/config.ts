@@ -9,3 +9,8 @@ export function getBrokersFromPorts(ports: string): string[] {
   const brokers = ports.split(',').map((port) => `localhost:${port}`);
   return brokers;
 }
+
+export enum KafkaTopics {
+  TEST = 'test',
+  RUST_CONSUMER = 'rust-consumer',
+}
