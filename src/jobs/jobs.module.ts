@@ -6,6 +6,7 @@ import { Job, JobSchema } from './entities/job.entity';
 import { HttpModule } from '@nestjs/axios';
 import { HttpClientService } from 'src/utils/http.client';
 import { ConfigService } from '@nestjs/config';
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
       useClass: HttpClientService,
       inject: [ConfigService],
     }),
+    KafkaModule,
   ],
   controllers: [JobsController],
   providers: [JobsService],

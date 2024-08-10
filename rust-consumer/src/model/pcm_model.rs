@@ -10,6 +10,29 @@ pub struct PCMDocument {
     id: String,
     job_name: String,
     job_execution_status: String,
+    phone_numbers: Vec<String>,
+    email_addresses: Vec<String>,
+    ip_addresses: Vec<String>,
+}
+
+impl PCMDocument {
+    pub fn new(
+        id: String,
+        job_name: String,
+        job_execution_status: String,
+        phone_numbers: Vec<String>,
+        email_addresses: Vec<String>,
+        ip_addresses: Vec<String>,
+    ) -> PCMDocument {
+        PCMDocument {
+            id,
+            job_name,
+            job_execution_status,
+            phone_numbers,
+            email_addresses,
+            ip_addresses,
+        }
+    }
 }
 
 pub struct PCMModel {
@@ -64,5 +87,15 @@ impl Repository<PCMDocument> for PCMModel {
                 return Err(err);
             }
         }
+    }
+
+    fn insert(&self, doc: PCMDocument) -> Result<(), mongodb::error::Error> {
+        return match self.collection.insert_one(doc, None) {
+            Ok(_) => Ok(()),
+            Err(err) => {
+                eprintln!("Error occured while inserting document {:?}", err);
+                Err(err)
+            }
+        };
     }
 }

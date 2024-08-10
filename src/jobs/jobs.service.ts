@@ -1,12 +1,14 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { firstValueFrom } from 'rxjs';
+import { KafkaService } from 'src/kafka/kafka.service';
+import { KafkaTopics } from 'src/utils/config';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Job } from './entities/job.entity';
-import { Model } from 'mongoose';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
+import { Job, JobStatus } from './entities/job.entity';
 
 interface TestResponse {
   id: string;
@@ -20,10 +22,24 @@ export class JobsService {
     @InjectModel(Job.name) private readonly jobModel: Model<Job>,
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
+    private readonly kafkaService: KafkaService,
   ) {}
-  create(createJobDto: CreateJobDto) {
+  async create(createJobDto: CreateJobDto) {
     createJobDto.createdAt = new Date();
-    return this.jobModel.create(createJobDto);
+    createJobDto.status = JobStatus.SCHEDULED;
+    const result = await this.jobModel.create(createJobDto);
+    this.kafkaService.sendMessage(
+      KafkaTopics.RUST_CONSUMER,
+      JSON.stringify({
+        ...result.toJSON(),
+        text: [
+          'My email is salman.sc829@gmail.com',
+          'My phone number is 1234567890',
+        ],
+      }),
+    );
+    const jsonRes = result.toJSON();
+    return jsonRes;
   }
 
   findAll(page: number, limit: number): Promise<Job[]> {

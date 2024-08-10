@@ -1,4 +1,5 @@
-import { IsDate, IsDateString, IsNotEmpty } from 'class-validator';
+import { IsDateString, IsNotEmpty } from 'class-validator';
+import { JobStatus } from '../entities/job.entity';
 
 export class CreateJobDto {
   @IsNotEmpty()
@@ -7,4 +8,6 @@ export class CreateJobDto {
   @IsNotEmpty()
   @IsDateString()
   startTime: Date;
+
+  status: JobStatus;
 }

@@ -20,15 +20,18 @@ export class KafkaService {
     this.producer = this.kafkaClient.producer({
       createPartitioner: Partitioners.LegacyPartitioner,
     });
+
+    this.producer.connect();
   }
 
   public sendMessage(topic: string, message: string): void {
-    this.producer.connect().then(() => {
-      KafkaService.logger.log('Message Sent to queue');
-      this.producer.send({
-        topic,
-        messages: [{ value: message }],
-      });
+    // this.producer.connect().then(() => {
+
+    // });
+    KafkaService.logger.log('Message Sent to queue');
+    this.producer.send({
+      topic,
+      messages: [{ value: message }],
     });
   }
 }
