@@ -25,3 +25,16 @@ export class Job {
 export const JobSchema = SchemaFactory.createForClass(Job);
 
 export type IJob = Document<Job>;
+
+// export type JobDTO = Omit<Job, '_id'> & { id: string };
+export class JobDTO {
+  _id: string;
+  name: string;
+  createdAt: Date;
+  startTime: Date;
+  status: JobStatus;
+
+  constructor(data: Partial<Job>) {
+    Object.assign(this, data);
+  }
+}

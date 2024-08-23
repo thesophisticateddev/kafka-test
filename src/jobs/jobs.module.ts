@@ -4,9 +4,9 @@ import { JobsController } from './jobs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Job, JobSchema } from './entities/job.entity';
 import { HttpModule } from '@nestjs/axios';
-import { HttpClientService } from 'src/utils/http.client';
+import { HttpClientService } from '../utils/http.client';
 import { ConfigService } from '@nestjs/config';
-import { KafkaModule } from 'src/kafka/kafka.module';
+import { KafkaModule } from '../kafka/kafka.module';
 
 @Module({
   imports: [

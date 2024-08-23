@@ -4,11 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
-import { KafkaService } from 'src/kafka/kafka.service';
-import { KafkaTopics } from 'src/utils/config';
+import { KafkaService } from '../kafka/kafka.service';
+import { KafkaTopics } from '../utils/config';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-import { Job, JobStatus } from './entities/job.entity';
+import { Job, JobDTO, JobStatus } from './entities/job.entity';
 
 interface TestResponse {
   id: string;
@@ -39,15 +39,20 @@ export class JobsService {
       }),
     );
     const jsonRes = result.toJSON();
-    return jsonRes;
+    return new JobDTO(jsonRes);
   }
 
   findAll(page: number, limit: number): Promise<Job[]> {
     return this.jobModel.find({}, {}, { skip: page * limit, limit }).exec();
   }
 
-  findOne(id: string) {
-    return this.jobModel.findById(id).exec();
+  findOne(id: string): Promise<JobDTO> {
+    return this.jobModel
+      .findById(id)
+      .exec()
+      .then((res) => {
+        return new JobDTO(res.toJSON());
+      });
   }
 
   update(id: string, updateJobDto: UpdateJobDto) {
@@ -59,9 +64,9 @@ export class JobsService {
   }
 
   async updateJobPost() {
-    const baseUrl = 'some url here';
+    const urlPath = 'some url here';
     const response = await firstValueFrom(
-      this.httpService.post<TestResponse>(baseUrl, {}),
+      this.httpService.post<TestResponse>(urlPath, {}),
     );
 
     console.log('Resposne', response);
