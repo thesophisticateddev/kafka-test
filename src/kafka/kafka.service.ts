@@ -12,6 +12,7 @@ export class KafkaService {
     this.kafkaClient = new Kafka({
       clientId: config.get<string>(EnvConstants.MESSAGE_QUEUE_CLIENT_ID),
       brokers: getBrokersFromPorts(
+        config.get<string>('KAFKA_HOST'),
         config.get<string>(EnvConstants.MESSAGE_QUEUE_PORTS),
       ),
     });

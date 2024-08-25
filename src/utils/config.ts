@@ -5,8 +5,9 @@ export enum EnvConstants {
   MESSAGE_QUEUE_CLIENT_ID = 'MQ_CLIENT_ID',
 }
 
-export function getBrokersFromPorts(ports: string): string[] {
-  const brokers = ports.split(',').map((port) => `localhost:${port}`);
+export function getBrokersFromPorts(host: string, ports: string): string[] {
+  const brokers = ports.split(',').map((port) => `${host}:${port}`);
+  console.log('Brokers: ', brokers);
   return brokers;
 }
 

@@ -13,12 +13,16 @@ services:
     restart: always
     depends_on:
       - zookeeper
+    links:
+      - zookeeper
     ports:
       - 29092:29092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_HOST_NAME: ${DOCKER_HOST_IP}
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://${DOCKER_HOST_IP}:9092'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -30,3 +34,31 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-app
+    # restart: always
+    environment:
+      - PORT=3000
+      - MQ_PORTS=9092,22181
+      - MQ_GROUP_ID=test-group
+      - MQ_CLIENT_ID=nest-client
+      - KAFKA_HOST=kafka
+      - DATABASE_HOST=mongo
+      - DATABASE_PORT=27017
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=example
+      - DATABASE_NAME=nest
+      - HTTP_TIMEOUT=10000
+      - HTTP_MAX_REDIRECTS=2
+    depends_on:
+      - kafka
+      - mongo
+      - zookeeper
+    ports:
+      - '3000:3000' # Port exposed by your Node.js app
+    # links:
+    #   - kafka
+    #   - zookeeper

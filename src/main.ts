@@ -13,6 +13,7 @@ async function bootstrap() {
     options: {
       client: {
         brokers: getBrokersFromPorts(
+          config.getOrThrow<string>('KAFKA_HOST'),
           config.get<string>(EnvConstants.MESSAGE_QUEUE_PORTS),
         ),
       },
