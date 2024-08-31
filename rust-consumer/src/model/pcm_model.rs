@@ -41,12 +41,20 @@ pub struct PCMModel {
 
 impl PCMModel {
     pub fn new(conn_str: String, db_name: String) -> PCMModel {
-        let client = mongodb::sync::Client::with_uri_str(&conn_str).unwrap();
-        let collection = client
-            .database(db_name.as_str())
-            .collection::<PCMDocument>(PCM_COLLECTION)
-            .clone_with_type();
-        PCMModel { collection }
+        let client_connected = mongodb::sync::Client::with_uri_str(&conn_str);
+        match client_connected {
+            Ok(client) => {
+                let collection = client
+                    .database(db_name.as_str())
+                    .collection::<PCMDocument>(PCM_COLLECTION)
+                    .clone_with_type();
+                PCMModel { collection }
+            }
+            Err(err) => {
+                error!("Error occured while connecting to mongodb {:?}", err);
+                panic!("Error occured while connecting to mongodb {:?}", err);
+            }
+        }
     }
 }
 

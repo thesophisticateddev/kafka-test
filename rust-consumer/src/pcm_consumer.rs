@@ -2,6 +2,7 @@ use kafka::{
     client::GroupOffsetStorage,
     consumer::{Consumer, Message},
 };
+use std::env;
 
 use crate::model::{
     pcm_model::{PCMDocument, PCMModel},
@@ -33,15 +34,38 @@ impl PCMConsumer {
             .with_offset_storage(Some(GroupOffsetStorage::Kafka))
             .create()
             .unwrap();
+
+        let mongo_user = env::var("MONGO_USER")
+            .unwrap_or("root".to_owned())
+            .to_owned();
+
+        let mongo_password = env::var("MONGO_PASSWORD")
+            .unwrap_or("example".to_owned())
+            .to_owned();
+
+        let mongo_host = env::var("MONGO_HOST")
+            .unwrap_or("localhost".to_owned())
+            .to_owned();
+
+        let mongo_port = env::var("MONGO_PORT")
+            .unwrap_or("27017".to_owned())
+            .to_owned();
+
+        let mongo_db = env::var("MONGO_DB").unwrap_or("nest".to_owned()).to_owned();
+
+        let repo = PCMModel::new(
+            format!(
+                "mongodb://{}:{}@{}:{}/",
+                mongo_user, mongo_password, mongo_host, mongo_port
+            ),
+            mongo_db,
+        );
         PCMConsumer {
             hosts: host_list,
             consumer,
             group_name: GROUP_NAME.to_owned(),
             topic: TOPIC.to_owned(),
-            repo: PCMModel::new(
-                "mongodb://root:example@localhost:27017/".to_owned(),
-                "nest".to_owned(),
-            ),
+            repo,
         }
     }
 }
